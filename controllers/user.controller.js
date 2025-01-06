@@ -61,8 +61,14 @@ const login= async(req, res)=>{
 
 const getAllUsers= async(req, res)=>{
     try {
+
+        // Only allow admins to view all users 
+        if(req.user.role !== 'Admin'){
+            return res.status(403).json({message: 'Access Denied '});
+        }
+
         const users= await User.find({}, '-password');
-        res.status(200).json({message: 'Users fetched successfully', user: users});
+        res.status(200).json({message: 'Users fetched successfully', data: users});
         
     } catch (error) {
         res.status(500).json({message: 'Internal server error'});
@@ -73,6 +79,11 @@ const updateUser= async(req, res)=>{
     try {
         const {name, email, password, age, role}= req.body;
         const {id}= req.params;
+
+        // Allow users to update their own details or allow admins to update any user
+        if (req.user.role !== 'Admin' && req.user._id.toString() !== id) {
+            return res.status(403).json({ message: 'You are not authorized to update this user' });
+        }
 
         const updates= {};
 
