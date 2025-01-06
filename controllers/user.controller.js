@@ -121,6 +121,7 @@ const deleteUser= async(req, res)=>{
 
         const {id}= req.params;
 
+         // Allow only admins to delete any user or a user to delete their own account
         if(req.user.role  !== 'Admin' && req.user._id.toString() !== id){
             return res.status(403).json({message: 'You are not authorized to delete this user'});
         }
