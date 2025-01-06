@@ -116,4 +116,25 @@ const updateUser= async(req, res)=>{
     }
 }
 
-module.exports= {signUp, login, getAllUsers, updateUser};
+const deleteUser= async(req, res)=>{
+    try {
+
+        const {id}= req.params;
+
+        if(req.user.role  !== 'Admin' && req.user._id.toString() !== id){
+            return res.status(403).json({message: 'You are not authorized to delete this user'});
+        }
+
+        const deleteUser= await User.findByIdAndDelete(id);
+        if(!deleteUser){
+            return res.status(404).json({message: 'User not found'});
+        }
+
+        res.status(200).json({message: 'User deleted successfully'});
+        
+    } catch (error) {
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+module.exports= {signUp, login, getAllUsers, updateUser, deleteUser};
